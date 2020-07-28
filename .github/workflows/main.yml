@@ -18,7 +18,7 @@ jobs:
     - name: Deploy to Azure Container Instances
       uses: Azure/aci-deploy@v1
       with:
-        resource-group: apm-visualstudio-rg
+        resource-group: ${{secrets.AZURE_RG}}
         # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
         #command-line: # optional, default is 
         # The DNS Name Label for Container with Public IP
@@ -27,7 +27,6 @@ jobs:
         #environment-variables: # optional, default is 
         # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
         image: vibrato/techtestapp
-        # IP Address type of the Container Group. Accepted Values are { Private, Public }
         ip-address: Public
         # Location where the Container will be deployed
         location: Australia East
