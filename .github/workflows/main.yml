@@ -1,10 +1,47 @@
-name: Azure Login
-  uses: Azure/login@v1
-    with:
-    # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
-    #   az ad sp create-for-rbac --name "myApp" --role contributor \
-    #                        --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
-    #                        --sdk-auth
-      creds: ${{secrets.AZURE_CREDENTIALS}}
-    # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
-      enable-AzPSSession: true # optional
+on: [push]
+
+name: AzurePowerShell
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Login via Az module
+      uses: azure/login@v1.1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+        enable-AzPSSession: true 
+        
+        
+    - name: Deploy to Azure Container Instances
+      uses: Azure/aci-deploy@v1
+      with:
+        resource-group: apm-visualstudio-rg
+        # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
+        #command-line: # optional, default is 
+        # The DNS Name Label for Container with Public IP
+        dns-name-label: dddlgjjf77fjjd
+        # List of environment variables for the container. Space-seperated in "key=value" format
+        #environment-variables: # optional, default is 
+        # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
+        image: vibrato/techtestapp
+        # IP Address type of the Container Group. Accepted Values are { Private, Public }
+        ip-address: Public
+        # Location where the Container will be deployed
+        location: Australia East
+        name: techtestappv2
+        # The OS type of the Containers. Accepted Values are  { Linux, Windows }
+        os-type: Linux
+        ports: 80 # optional, default is 80
+        # The container image registry login server
+        registry-login-server: techtestappcr.azurecr.io
+        # Username to log in Container Image Registry Server
+        registry-username: techtestappcr
+        # Password to log in Container Image Registry Server
+        registry-password: ${{secrets.AZURE_ACR_PASSWORD}} 
+        # Restart Policy for the container(s). Accepted Values are { Always, OnFailure, Never }
+        restart-policy: Always
+        # List of secure environment variables for the container. Space seperated values in "key=value" format
+        #   secure-environment-variables: # optional, default is :  
