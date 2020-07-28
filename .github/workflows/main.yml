@@ -20,7 +20,7 @@ jobs:
       with:
         resource-group: ${{secrets.AZURE_RG}}
         # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
-        #command-line: # optional, default is 
+        command-line: "./TechTestApp updatedb && ./TechTestApp start"
         # The DNS Name Label for Container with Public IP
         dns-name-label: dddlgjjf77fjjd
         # List of environment variables for the container. Space-seperated in "key=value" format
