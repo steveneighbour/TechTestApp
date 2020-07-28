@@ -21,7 +21,7 @@ jobs:
         # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
         #command-line: ""
         # The DNS Name Label for Container with Public IP
-        dns-name-label: dddlfffdgjjf77fjjd
+        dns-name-label: ${{secrets.AZURE_RG}}${{github.run_number}}db
         # List of environment variables for the container. Space-seperated in "key=value" format
         #environment-variables: # optional, default is 
         # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
@@ -51,7 +51,7 @@ jobs:
         # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
         command-line: "./TechTestApp updatedb && ./TechTestApp start"
         # The DNS Name Label for Container with Public IP
-        dns-name-label: dddlgjjf77fjjd
+        dns-name-label: ${{secrets.AZURE_RG}}${{github.run_number}}app
         # List of environment variables for the container. Space-seperated in "key=value" format
         #environment-variables: # optional, default is 
         # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
@@ -72,4 +72,4 @@ jobs:
         # Restart Policy for the container(s). Accepted Values are { Always, OnFailure, Never }
         restart-policy: Always
         # List of secure environment variables for the container. Space seperated values in "key=value" format
-        secure-environment-variables: "VTT_LISTENPORT=3000 VTT_LISTENHOST=dddlfffdgjjf77fjjd.australiaeast.azurecontainer.io VTT_DBHOST=dddlfffdgjjf77fjjd.australiaeast.azurecontainer.io"
+        secure-environment-variables: "VTT_LISTENPORT=3000 VTT_LISTENHOST=${{secrets.AZURE_RG}}${{github.run_number}}db.australiaeast.azurecontainer.io VTT_DBHOST=${{secrets.AZURE_RG}}${{github.run_number}}db.australiaeast.azurecontainer.io"
