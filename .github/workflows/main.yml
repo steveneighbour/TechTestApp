@@ -26,13 +26,13 @@ jobs:
         #environment-variables: # optional, default is 
         # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
         image: postgres:latest
-        ip-address: Private
+        ip-address: Public
         # Location where the Container will be deployed
         location: Australia East
         name: techtestappv2
         # The OS type of the Containers. Accepted Values are  { Linux, Windows }
         os-type: Linux
-        ports: 3000 # optional, default is 80
+        ports: 3000 5432 # optional, default is 80
         # The container image registry login server
         registry-login-server: techtestappcr.azurecr.io
         # Username to log in Container Image Registry Server
