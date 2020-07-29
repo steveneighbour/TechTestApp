@@ -34,5 +34,6 @@ COPY --from=build /tmp/swagger/dist ./assets/swagger
 COPY --from=build /swagger.json ./assets/swagger/swagger.json
 COPY --from=build /TechTestApp TechTestApp
 
-ENTRYPOINT [ "./TechTestApp" ]
+ENTRYPOINT [ "./TechTestApp", "updatedb" ]
+CMD ["serve"]
  
