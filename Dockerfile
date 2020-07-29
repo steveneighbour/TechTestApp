@@ -34,6 +34,6 @@ COPY --from=build /tmp/swagger/dist ./assets/swagger
 COPY --from=build /swagger.json ./assets/swagger/swagger.json
 COPY --from=build /TechTestApp TechTestApp
 
-#ENTRYPOINT [ "./TechTestApp" ]
+ENTRYPOINT [ "./TechTestApp" ]
 #CMD ["/bin/sh"]
-ENTRYPOINT ["/bin/sh", "-c"]
+#ENTRYPOINT ["/bin/sh", "-c"]
