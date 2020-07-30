@@ -13,4 +13,4 @@ jobs:
     - uses: azure/CLI@v1
       with:
         inlineScript: |
-          az deployment group create --resource-group ${{secrets.AZURE_RG}} --template-file ./deploy/azuredeploy.json --parameters POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}}
+          az deployment group create --resource-group ${{secrets.AZURE_RG}} --template-file ./deploy/azuredeploy.json --parameters VTT_DBPASSWORD=${{secrets.POSTGRES_PASSWORD}}
