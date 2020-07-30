@@ -1,0 +1,165 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "type": "string",
+      "defaultValue": "TechTestAppContainerGroup",
+      "metadata": {
+        "description": "Container Group name."
+      }
+    },
+    "VTT_LISTENPORT": {
+      "type": "string",
+      "defaultValue": "80",
+      "metadata": {
+        "description": "Web Server Listen Port"
+      }
+    },
+    "VTT_LISTENHOST": {
+      "type": "string",
+      "defaultValue": "0.0.0.0",
+      "metadata": {
+        "description": "Web Server Listen Host"
+      }
+    },
+     "VTT_DBHOST": {
+      "type": "string",
+      "defaultValue": "0.0.0.0",
+      "metadata": {
+        "description": "Database Server Listen Host"
+      }
+    },
+    "POSTGRES_PASSWORD": {
+      "type": "string",
+      "metadata": {
+        "description": "Postgres DB password"
+      }
+    },
+    "dnsNameLabel": {
+      "type": "string",
+      "defaultValue": "techapptest1234xxx",
+      "metadata": {
+      "description": "Define the DNS name for the container group. Name will get suffix <region_name>.azurecontainer.io. The name must be unique."
+      }
+      }
+  },
+  "variables": {
+    "container1name": "dbupdate",
+    "container1image": "sneighbour/techtestapp",
+    "container2name": "techtestapp",
+    "container2image": "sneighbour/techtestapp",
+    "container3name": "postgres",
+    "container3image": "postgres:latest"
+  },
+  "resources": [
+    {
+      "name": "[parameters('containerGroupName')]",
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "initContainers": [
+          {
+            "name": "[variables('container1name')]",
+            "properties": {
+              "image": "[variables('container1image')]",
+              "environmentVariables": [
+                {
+                    "name": "VTT_DBHOST",
+                    "value": "[parameters('VTT_DBHOST')]"
+                },
+                {
+                    "name": "VTT_LISTENHOST",
+                    "value": "[parameters('VTT_LISTENHOST')]"
+                }
+              ],
+              "command": [
+                "./TechTestApp" , "updatedb"
+              ]
+            }
+          }
+        ],
+          "containers": [
+          {
+            "name": "[variables('container2name')]",
+            "properties": {
+              "image": "[variables('container2image')]",
+              "environmentVariables": [
+                {
+                    "name": "VTT_DBHOST",
+                    "value": "[parameters('VTT_DBHOST')]"
+                },
+                {
+                    "name": "VTT_LISTENPORT",
+                    "value": "[parameters('VTT_LISTENPORT')]"
+                },
+                {
+                    "name": "VTT_LISTENHOST",
+                    "value": "[parameters('VTT_LISTENHOST')]"
+                }
+            ],
+              "command": [
+                "./TechTestApp" , "serve"
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 1.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 80
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('container3name')]",
+            "properties": {
+              "image": "[variables('container3image')]",
+              "environmentVariables": [
+                {
+                    "name": "VTT_DBHOST",
+                    "value": "[parameters('VTT_DBHOST')]"
+                },
+                {
+                    "name": "POSTGRES_PASSWORD",
+                    "value": "[parameters('POSTGRES_PASSWORD')]"
+                },
+               {
+                    "name": "VTT_LISTENHOST",
+                    "value": "[parameters('VTT_LISTENHOST')]"
+                }
+            ],
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 1.5
+                }
+              }
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "dnsNameLabel": "[parameters('dnsNameLabel')]",
+          "ports": [
+            {
+              "protocol": "tcp",
+              "port": 80
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "containerIPv4Address": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups/', parameters('containerGroupName'))).ipAddress.ip]"
+    }
+  }
+}
