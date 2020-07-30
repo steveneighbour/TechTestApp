@@ -1,75 +1,16 @@
 on: [push]
 
-name: AzurePowerShell
+name: Azure ARM Deployment
 
 jobs:
-
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    
-    - name: Login via Az module
-      uses: azure/login@v1.1
+    - uses: actions/checkout@master
+    - uses: azure/login@v1
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
-        enable-AzPSSession: true 
-        
-    - name: Deploy PostgresDB Azure Container Instances
-      uses: Azure/aci-deploy@v1
+    - uses: azure/CLI@v1
       with:
-        resource-group: ${{secrets.AZURE_RG}}
-        # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
-        #command-line: ""
-        # The DNS Name Label for Container with Public IP
-        dns-name-label: ${{secrets.AZURE_RG}}${{github.run_number}}db
-        # List of environment variables for the container. Space-seperated in "key=value" format
-        #environment-variables: # optional, default is 
-        # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
-        image: postgres:latest
-        ip-address: Public
-        # Location where the Container will be deployed
-        location: Australia East
-        name: techtestappv2
-        # The OS type of the Containers. Accepted Values are  { Linux, Windows }
-        os-type: Linux
-        ports: 3000 5432 # optional, default is 80
-        # The container image registry login server
-        registry-login-server: techtestappcr.azurecr.io
-        # Username to log in Container Image Registry Server
-        registry-username: techtestappcr
-        # Password to log in Container Image Registry Server
-        registry-password: ${{secrets.AZURE_ACR_PASSWORD}} 
-        # Restart Policy for the container(s). Accepted Values are { Always, OnFailure, Never }
-        restart-policy: Always
-        # List of secure environment variables for the container. Space seperated values in "key=value" format
-        secure-environment-variables: "POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}}"
-
-    - name: Deploy Application to Azure Container Instances
-      uses: Azure/aci-deploy@v1
-      with:
-        resource-group: ${{secrets.AZURE_RG}}
-        # The command line to run when the container is started, e.g. "/bin/bash -c myscript.sh"
-        command-line: "./TechTestApp updatedb && ./TechTestApp start"
-        # The DNS Name Label for Container with Public IP
-        dns-name-label: ${{secrets.AZURE_RG}}${{github.run_number}}app
-        # List of environment variables for the container. Space-seperated in "key=value" format
-        #environment-variables: # optional, default is 
-        # Specify the fully qualified container image name. For example, "myregistry.azurecr.io/nginx:latest" or "python:3.7.2-alpine/"
-        image: vibrato/techtestapp
-        ip-address: Public
-        # Location where the Container will be deployed
-        location: Australia East
-        name: techtestappv2
-        # The OS type of the Containers. Accepted Values are  { Linux, Windows }
-        os-type: Linux
-        ports: 80 # optional, default is 80
-        # The container image registry login server
-        registry-login-server: techtestappcr.azurecr.io
-        # Username to log in Container Image Registry Server
-        registry-username: techtestappcr
-        # Password to log in Container Image Registry Server
-        registry-password: ${{secrets.AZURE_ACR_PASSWORD}} 
-        # Restart Policy for the container(s). Accepted Values are { Always, OnFailure, Never }
-        restart-policy: Always
-        # List of secure environment variables for the container. Space seperated values in "key=value" format
-        secure-environment-variables: "VTT_LISTENPORT=3000 VTT_LISTENHOST=${{secrets.AZURE_RG}}${{github.run_number}}db.australiaeast.azurecontainer.io VTT_DBHOST=${{secrets.AZURE_RG}}${{github.run_number}}db.australiaeast.azurecontainer.io"
+        inlineScript: |
+          az deployment group create --resource-group ${{secrets.AZURE_RG}} --template-file ./deploy/azuredeploy.json --parameters POSTGRES_PASSWORD=${{secrets.POSTGRES_PASSWORD}}
