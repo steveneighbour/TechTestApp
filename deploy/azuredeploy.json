@@ -30,7 +30,7 @@
         "description": "Database Server Listen Host"
       }
     },
-    "POSTGRES_PASSWORD": {
+    "VTT_DBPASSWORD": {
       "type": "string",
       "metadata": {
         "description": "Postgres DB password"
@@ -45,8 +45,6 @@
       }
   },
   "variables": {
-    "container1name": "dbupdate",
-    "container1image": "sneighbour/techtestapp",
     "container2name": "techtestapp",
     "container2image": "sneighbour/techtestapp",
     "container3name": "postgres",
@@ -59,62 +57,8 @@
       "apiVersion": "2019-12-01",
       "location": "[resourceGroup().location]",
       "properties": {
-        "initContainers": [
-          {
-            "name": "[variables('container1name')]",
-            "properties": {
-              "image": "[variables('container1image')]",
-              "environmentVariables": [
-                {
-                    "name": "VTT_DBHOST",
-                    "value": "[parameters('VTT_DBHOST')]"
-                },
-                {
-                    "name": "VTT_LISTENHOST",
-                    "value": "[parameters('VTT_LISTENHOST')]"
-                }
-              ],
-              "command": [
-                "./TechTestApp" , "updatedb"
-              ]
-            }
-          }
-        ],
+        "sku": "Standard",
           "containers": [
-          {
-            "name": "[variables('container2name')]",
-            "properties": {
-              "image": "[variables('container2image')]",
-              "environmentVariables": [
-                {
-                    "name": "VTT_DBHOST",
-                    "value": "[parameters('VTT_DBHOST')]"
-                },
-                {
-                    "name": "VTT_LISTENPORT",
-                    "value": "[parameters('VTT_LISTENPORT')]"
-                },
-                {
-                    "name": "VTT_LISTENHOST",
-                    "value": "[parameters('VTT_LISTENHOST')]"
-                }
-            ],
-              "command": [
-                "./TechTestApp" , "serve"
-              ],
-              "resources": {
-                "requests": {
-                  "cpu": 1,
-                  "memoryInGb": 1.5
-                }
-              },
-              "ports": [
-                {
-                  "port": 80
-                }
-              ]
-            }
-          },
           {
             "name": "[variables('container3name')]",
             "properties": {
@@ -126,7 +70,7 @@
                 },
                 {
                     "name": "POSTGRES_PASSWORD",
-                    "value": "[parameters('POSTGRES_PASSWORD')]"
+                    "value": "[parameters('VTT_DBPASSWORD')]"
                 },
                {
                     "name": "VTT_LISTENHOST",
@@ -140,8 +84,45 @@
                 }
               }
             }
+          },
+             {
+            "name": "[variables('container2name')]",
+            "properties": {
+              "image": "[variables('container2image')]",
+              "environmentVariables": [
+                {
+                    "name": "VTT_DBHOST",
+                    "value": "[parameters('VTT_DBHOST')]"
+                },
+                 {
+                    "name": "VTT_DBPASSWORD",
+                    "value": "[parameters('VTT_DBPASSWORD')]"
+                },
+                {
+                    "name": "VTT_LISTENPORT",
+                    "value": "[parameters('VTT_LISTENPORT')]"
+                },
+                {
+                    "name": "VTT_LISTENHOST",
+                    "value": "[parameters('VTT_LISTENHOST')]"
+                }
+            ],
+                "command": ["/bin/sh", "-c", "sleep 10 ; ./TechTestApp updatedb; ./TechTestApp serve"],
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 1.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 80
+                }
+              ]
+            }
           }
         ],
+        "restartPolicy": "OnFailure",
         "osType": "Linux",
         "ipAddress": {
           "type": "Public",
