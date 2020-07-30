@@ -32,4 +32,15 @@ Github Action Screenshot
 
 ### End Result
 
+![HomePage](https://github.com/steveneighbour/TechTestApp/raw/master/deploy/homepage.png)
+
+
 ![Swagger](https://github.com/steveneighbour/TechTestApp/raw/master/deploy/swagger.png)
+
+Website is accessible here;
+
+http://techapptest1234xxx.australiaeast.azurecontainer.io
+
+http://techapptest1234xxx.australiaeast.azurecontainer.io/swagger/
+
+Please let me know when i can tear down the Azure resources
